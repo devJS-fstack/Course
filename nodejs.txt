@@ -1,0 +1,161 @@
+npm: node package manager
+
+Template engine ( handlenbars):Handlebars là một ngôn ngữ tạo mẫu đơn giản .
+Nó sử dụng một mẫu và một đối tượng đầu vào để tạo HTML hoặc các định dạng văn bản khác.
+Các mẫu Handlebars trông giống như văn bản thông thường với các biểu thức Handlebars được nhúng.
+static file scss: sử dụng file scss để render ra file css
+    "watch": "node-sass --watch src/rsc/scss/ --output src/public/css/ ",
+input là file scss => output là file css
+để lưu những thay đổi khi file thay đổi
+boostrap: responsive (link: head & js)
+
+node-mon:là một công cụ giúp phát triển các ứng dụng dựa trên node.js bằng cách tự động khởi động lại
+ứng dụng node khi phát hiện thấy các thay đổi tệp trong thư mục.
+basic routing: request và response
+get method: lấy yêu cầu từ client 
+query parameters: => 1 object có các value từ các thành phần có attribute là name 
+Form default behavior: 	hành vi mặc định submit ở phương thức là GET, action có thể chuyển đến page khác
+app.use(express.urlencoded({
+    extended: true,
+}));
+app.use(express.json());
+
+chuyển sang kiểu dữ liệu object cho body =>
+app.post('/search', (req, res) => {
+    console.log(req.body) // ==> object {
+                                          q:"dev nguyen la ai"
+                                          gender:"male"
+                                           }
+    res.send('')
+});
+
+__dirname là đường dẫn tới folder hiện tại của file
+ app.use(morgan('combined')); => bắn ra lỗi
+ app.engine('hbs', handlebars({
+    extname: '.hbs'
+})  => extname: định dạng lại đuôi file
+app.use(express.static(path.join(__dirname, 'public'))); => public các file tĩnh của web
+node-mon => listening : lưu khi file thay đổi
+
+------------------- Note -------------------
+phải cài phiên bản "express-handlebars": "^5.1.0", 
+nếu không sẽ bị lỗi như handlebars không phải một function hoặc cannot found find
+
+ 
+---------------- Mô hình MVC ----------------
+MVC là gì/ => Model views controller
+Có các thành phần chính 
++View => chứa file views,ảnh,audio...
++Model: bao gồm dữ liệu cả trang web(MySQL, MonggoDB..)
++Controller: bộ phận điều khiển chính
+Browser: Nơi lấy những yêu cầu từ phía client, được gửi lên web server => Dispatcher(điều phối: đọc phương thức thực hiện function handle),
+Routes(tuyến đường) => controller <=> views <=> Model  
+                                                     => lại đưa về cho phía controller xử lý và đưa lại ra web server 
+                                                     => tiếp tục đưa ra browser,hiển thị trang web
+
+(+): thành phần chính
+
+file Controller sẽ là nơi thực hiện các yêu cầu từ phía client
+trong file routers/index.js sẽ có nhiều routers nên sẽ dẫn đến file đã export từ trước từ đó nhận ra router nào làm việc gì
+file routes sẽ là nơi dispatcher các đường dẫn, từng router sẽ có các handle khác nhau
+
+
+---------------- Đọc file Database ----------------
+
+home(req, res, next) {
+
+        Course.find({})
+            .then(courses => {
+                res.render('home', {
+                    courses: mutipleMongooseToObject(courses),
+                });
+            })
+            .catch(next);
+}
+
+Course.find({}) => giống SELECT * FROM XXX => khi select thành công => .then (courses) có 1 arr khóa học => render ra courses nhưng phải
+                                                                       chuyển sang dạng Object bằng func toObject của Mongoose 
+                                                                       ( vì Course return ra một function prototype
+                                                                        gồm nhiều constructor) 
+                                                                         để từ đó render ra được dữ liệu bên file home.hbs
+                                                                         ** handlebar ver cao không cho truy cập đến nhưng property của 1 đối tượng
+
+                        ==> module.exports = {
+    mutipleMongooseToObject: (mongooseArrs) => {
+        return mongooseArrs.map((mongooseArr) => mongooseArr.toObject()
+        );
+    },
+    mongooseToObject: (mongoose) => {
+        return mongoose ? mongoose.toObject() : mongoose;
+    }
+};
+
+===============> Nhận vào 1 tham số:
++ Nếu là nhiều mongooseArr thì sẽ thực thi mutipleMongooseToObject (vd: Courses sẽ gồm nhiều Course ở trong)
++ Nếu chỉ có 1 thì sẽ thực thi mongooseToObject
+
+---------------- Cách truyền file db vào html ----------------
+
+* tham số thứ 2 của res.render để export ra ngoài file home.js
+VD:res.render('home', 
+{
+    courses
+});
+{{#each [đối tượng được export ra bên file Controller, VD: courses]}} để bắt đầu 1 vòng lặp
+{{/each}} để kết thúc 1 vòng lặp
+
+{{this.[key]}} để query dữ liệu từ file controller
+
+
+----------------- Show detail course -----------------
+
+B1: tạo file views course.hbs
+B2: Định nghĩa ra 1 route mới cho course => course.js {
+    const express = require('express');
+    const router = express.Router();
+    const courseController = require('../app/controllers/CourseController')
+    router.get('/:slug', courseController.showDetail)
+    module.exports = router;
+}
+==> Nếu route có slug phía sau thì sẽ thực thi func showDetail bên file courseController
+
+B3: Tạo file Controller cho course {
+    req.params.slug => query được params tìm kiếm ở url 
+    findOne({
+    --- truyền điều kiện tìm ----
+    }).then (=> khi thành công return ra 1 course)
+
+** Trước khi thêm key vào DB nhớ định nghĩa ở file Model
+}
+B4: khi đã render ra view ('courses/showDetail') thì sẽ sẽ export ra course 
+{
+
+ res.render('courses/showDetail', {
+                    course: mongooseToObject(course),
+                })
+}
+
+** chuyển course sang kiểu object literal
+
+
+--------------------- CRUD 1 : Create new course ---------------------
+
+B1: tạo 1 route => /course/create
+B2: tạo Form với method là POST, action là /course/store 
+router.post('/store', courseController.store);
+
+
+B3: store(req,res)
+  const formData = req.body;
+        formData.thumbnail = `https://img.youtube.com/vi/${req.body.videoId}/maxresdefault.jpg`;
+
+        tạo 1 thumbnail có đường dẫn mặc định từ video id sẽ có được link ảnh
+
+        tạo slug theo name course, nếu trùng sẽ random khác
+
+
+tạo 1 phương thức ở hdb trong file index.js => để đánh stt ở index 1
+redirect => tạo 1 điều hướng 
+
+
+?method => để ghi đè lên phương thức post bằng put,patch,delete

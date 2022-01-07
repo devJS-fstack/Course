@@ -1,0 +1,39 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "nope",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "nodemon --inspect src/main.js",
+    "watch": "node-sass --watch src/rsc/scss/ --output src/public/css/ ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vantinh728/FirstNode.git"
+  },
+  "keywords": [
+    "nodejs",
+    "exercise"
+  ],
+  "author": "devnguyen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vantinh728/FirstNode/issues"
+  },
+  "homepage": "https://github.com/vantinh728/FirstNode#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "express": "^4.17.2",
+    "express-handlebars": "^5.1.0",
+    "m": "^1.7.0",
+    "method-override": "^3.0.0",
+    "mongoose": "^6.1.4",
+    "mongoose-delete": "^0.5.4",
+    "node-sass": "^7.0.1",
+    "nodemon": "^2.0.15"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0"
+  }
+}

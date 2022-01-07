@@ -1,0 +1,24 @@
+
+@import 'variables' ;
+
+
+.test{
+    height: 1px;
+    width: 1px;
+}
+
+.card-course-item{
+    margin-top:16px;
+}
+
+.user-avatar{
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin-right: 4px;
+}
+
+.btn-td{
+    display: flex;
+    justify-content: space-between;
+}

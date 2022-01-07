@@ -1,0 +1,88 @@
+<div class="mt-4">
+    <div>
+        <h3>My Course</h3>
+        <a href="/me/trash/courses">
+            Trash for course ({{count}})
+        </a>
+    </div>
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name Course</th>
+                <th scope="col">Description</th>
+                <th scope="col" colspan="2">Time Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each course}}
+            <tr>
+                <th scope="row">{{sum 1 @index}}</th>
+                <td>{{this.name}}</td>
+                <td>{{this.description}}</td>
+                <td>{{this.createdAt}}</td>
+                <td class="btn-td">
+                    <a href="/courses/{{this._id}}/edit" class="btn btn-link">Update</a>
+                    <a href="#" class="delete-btn btn btn-link" data-bs-toggle="modal"
+                        data-bs-target="#delete-course-modal" data-id="{{this._id}}">Delete</a>
+                </td>
+            </tr>
+
+            {{else}}
+            <tr>
+                <td colspan="5" class="text-center">
+                    You Don't Have Any Course.
+                    <a href="/courses/create">Create Course Now</a>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+
+
+{{!-- {{Confirm Delete}} --}}
+
+<!-- Button trigger modal -->
+<div id="delete-course-modal" class="modal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Course?</h5>
+            </div>
+            <div class="modal-body">
+                <p>Do you sure to confirm delete course?.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-delete-course" type="button" class="btn btn-danger">Delete</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{!-- Delete hidden form --}}
+<form method="POST" name="deleteForm"></form>
+
+<script>
+    const deleteBtn = document.querySelectorAll('.delete-btn');
+    const modal = document.querySelector('.modal')
+    const close = document.querySelector('.btn-secondary');
+    const btnConfDel = document.getElementById('btn-delete-course');
+    var dataId;
+    var deleteForm = document.forms["deleteForm"];
+    deleteBtn.forEach((btn) => {
+        btn.onclick = () => {
+            modal.style.display = "block";
+            dataId = btn.getAttribute('data-id');
+        }
+    })
+    close.onclick = () => {
+        modal.style.display = "none";
+    }
+    btnConfDel.onclick = () => {
+        deleteForm.action = `/courses/${dataId}?_method=DELETE`;
+        deleteForm.submit();
+    }
+</script>
